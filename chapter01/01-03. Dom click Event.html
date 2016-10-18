@@ -1,0 +1,28 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	01-03. Dom click event
+</title>
+<style>
+
+</style>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	d3.select("body").append("div").style("border", "1px black solid").html("hello world");
+	d3.select("div").style("background-color", "pink").style("font-size", "24px")
+	.attr("id", "newDiv").attr("class","d3div")
+	.on("click", function() {
+		console.log(this);
+	})
+	
+	
+}
+</script>
+</head>
+<body>
+</body>
+</html>
