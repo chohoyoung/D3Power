@@ -9,11 +9,11 @@ D3 목적은 웹에서 데이터 시각화를 정교하게 하려는 목적. D3�
 이제 데이터는 차트,선, 그래프등의 시각화를 뛰어넘어 차트를 그리기 위한 벡터그래픽, 표, 리스트, HTML요소, 지리공간, 네트워크 시각화를 그릴수 있다.
 데이터 시각화에 대한 예제를 보려면 **[여기](http://christopheviau.com/d3list/gallery.html)**를 참고하기 바란다.
 ### 1.2.2 D3는 셀렉션과 바인딩
-셀렉션은 jquery의 셀렉션과 비슷하다. 예를 들면 d3.select(), d3.selectAll()이 있는데 select()는 찾아낸 첫번째 요소를 선택하고 selectAll() 찾아낸 모든 요소를 선택한다.
-	// a클래스를 가진 사각형을 모두 선택해 녹색으로 칠하라.
-	d3.selectAll('rect.a').stlye('fill', 'green');
-	// a클래스를 가진 사각형의 최초 하나를 파란색으로 칠하라.
-	d3.select('rect.a')	.style('fill', 'blue');
+ 셀렉션은 jquery의 셀렉션과 비슷하다. 예를 들면 d3.select(), d3.selectAll()이 있는데 select()는 찾아낸 첫번째 요소를 선택하고 selectAll() 찾아낸 모든 요소를 선택한다.
+    // a클래스를 가진 사각형을 모두 선택해 녹색으로 칠하라.
+    d3.selectAll('rect.a').stlye('fill', 'green');
+    // a클래스를 가진 사각형의 최초 하나를 파란색으로 칠하라.
+    d3.select('rect.a')	.style('fill', 'blue');
 
 
 
