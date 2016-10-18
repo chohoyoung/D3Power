@@ -1,0 +1,21 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	01-01. First sample
+</title>
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script>
+window.onload = function() {
+	d3.select("#someDiv").style("border", "5px darkgray dashed");
+	d3.select("#someDiv").attr("id", "newId");
+	d3.select("#someCheckbox").property("checked", true);
+}
+</script>
+</head>
+<body>
+	<div id="someDiv" style="width:200px;height:100px;border:black 1px solid;">
+		<input id="someCheckbox" type="checkbox" />
+	</div>
+</body>
+</html>
