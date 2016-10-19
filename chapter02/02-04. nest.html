@@ -1,0 +1,30 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-04. nest
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	
+	d3.json('../data/tweets.json', function(data) {
+		let tweetData = data.tweets;
+		let nestedTweets = d3.nest()
+			.key(function(el) { return el.user })	// 범주로 쓸 키를 지정
+			.entries(tweetData);	// 대상이되는 아이템
+		console.log(nestedTweets);
+	});
+
+}
+
+</script>
+</head>
+<body>
+	
+</body>
+</html>
+

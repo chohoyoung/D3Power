@@ -1,0 +1,37 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-02. Scale's Domain and Range
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	
+	let ramp = d3.scaleLinear().domain([500000, 1300000]).range([0, 500]);
+	console.log(ramp(500000));	// 0
+	console.log(ramp(1000000));	//	312.5
+	console.log(ramp(1300000));	// 500
+	// invert는 역으로 변환한다 즉 range값을 기준으로 domain값을 구한다.
+	console.log(ramp.invert(300));
+
+	// 숫자값도 돼지만 숫자로 색도 그 규모를 변경할 수 잇다.
+	let color = d3.scaleLinear().domain([500000, 1300000]).range(["blue", "red"]);
+	console.log(color(500000));	// rgb(0, 0, 255)
+	console.log(color(1000000));	//	rgb(159, 0, 96)
+	console.log(color(1300000));	// rgb(255, 0, 0)
+	// invert 메소드는 숫자값에서밖에 사용 할 수 없다. 그래서 300을 넣든, 칼라 코드를 넣든 NaN이 나온다.
+	console.log(color.invert("#000000"));	
+
+}
+
+</script>
+</head>
+<body>
+	
+</body>
+</html>
+

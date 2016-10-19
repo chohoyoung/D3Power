@@ -1,0 +1,39 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-03. scale quantile
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	
+	let data = [423, 849, 156, 891, 231, 781, 398, 1, 53];
+	// domain을 실행시 data값을 오름차순 정렬하고 range기준으로 그룹화를 한다고 볼수 있다.
+	let qScale = d3.scaleQuantile().domain(data).range([0, 1, 2]);
+
+	// 전달된 값은 값이 속한 그룹(범주)의 값을 넘긴다.
+	console.log(qScale(423));	// 1
+	console.log(qScale(891));	// 2
+	console.log(qScale(1));	// 0
+	
+	// 문자열도 가능
+	let qScaleText = d3.scaleQuantile().domain(data).range(['small', 'medium', 'large']);
+
+	console.log(qScaleText(423));	// medium
+	console.log(qScaleText(891));	// large
+	console.log(qScaleText(1));	// small
+
+
+}
+
+</script>
+</head>
+<body>
+	
+</body>
+</html>
+

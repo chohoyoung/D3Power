@@ -1,0 +1,43 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-05. measurement
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	d3.csv('../data/cities.csv', function(error, data) {
+		dataAppend(data);
+	});
+
+	function dataAppend(appendData) {
+		d3.select('body').selectAll('div.cities')
+			.data(appendData)
+			// data바인딩 후 셀렉션에 선택된 데이터에 따라서 enter와 exit가 설정이 된다.
+			// data의 갯수보다 선택된엘리먼트가 적으면 enter()는 선택된 엘리먼트갯수를 제거한 갯수만큼 가상의 객체를 생성한다.
+			// exit()는 enter와 반대인데 엘리먼트가 data값보다 많을경우 많은 엘리먼트 갯수만큼 가상 객체를 가지게 된다.
+			.enter()
+			.append('div')
+			.attr('class', 'cities')
+			.html(function(d, i) {
+				return d.label;
+			});
+
+		// 1번째 데이터의 object값이 모두 표시된다.
+		console.log(document.getElementsByClassName('cities')[0].__data__);
+
+	}
+	
+}
+
+</script>
+</head>
+<body>
+	
+</body>
+</html>
+
