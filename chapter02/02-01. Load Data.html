@@ -1,0 +1,22 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-01. Load Data
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	
+	d3.csv('http://localhost/jesus/data/cities.csv', function(data) {
+		console.log(data);
+	})
+}
+</script>
+</head>
+<body>
+	
+</body>
+</html>
