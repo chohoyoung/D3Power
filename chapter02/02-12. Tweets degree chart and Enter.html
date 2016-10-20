@@ -1,0 +1,89 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-11. Tweets degree chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	// tweets를 로딩해서 쓴다.
+	d3.json('../data/tweets.json', function(error, data) {
+		degreeView(data.tweets);
+	});
+
+	function degreeView(data) {
+		for(el of data) {
+			// favorite 갯수와 retweet 갯수를 구해서 영향력 점수라 하자. 그리고 새로운 속성에 넣자.
+			el.impact = el.favorites.length + el.retweets.length;
+			// ISO 8906 표준에 따르는 문자를 Date로 바꾸자. 그리고 새로운 속성에 넣자.
+			el.tweetTime = new Date(el.timestamp);
+		}
+
+		// 영향력 최대 점수를 구한다.
+		let maxImpact = d3.max(data, function(el) { return el.impact; });
+		// 최초/마지막 시간을 구한다.
+		let startEndDate = d3.extent(data, function(el) { return el.tweetTime; });
+		// 시간 정규화, startEndDate는 배열 [최초, 마지막]
+		let timeRamp = d3.scaleLinear().domain(startEndDate).range([20, 480]);
+		// 영향력 점수 정규화
+		let yScale = d3.scaleLinear().domain([0, maxImpact]).range([0, 460]);
+		// 원의 반지름 사이즈 크기
+		let radiusScale = d3.scaleLinear().domain([0, maxImpact]).range([0, 20]);
+		// 영향력을 흰색과 진한 빨간색 사이의 색으로 대응하는 스캐일 생성
+		let colorScale = d3.scaleLinear().domain([0, maxImpact]).range(['white', '#990000']);
+
+		let tweetGroup = d3.select('svg')
+			.selectAll('circle')
+			.data(data)
+			.enter()
+			.append('g')
+			// 그룹을 만들고 그룹의 자표값을 지정한다.
+			.attr('transform', function(d) {
+				return 'translate(' + timeRamp(d.tweetTime) + ',' + (480 - yScale(d.impact)) + ')'
+			});
+
+			// 새로 생성되는 그룹에 circle을 넣는다.
+			tweetGroup.append('circle')
+			// 영향력 높을수록 원이 커진다.
+			.attr('r', function(d) { return radiusScale(d.impact); })
+			// 영향력이 높을수록 많이 붉은 색이다.
+			.style('fill', function(d) { return colorScale(d.impact); })
+			.style('stroke', 'black')
+			.style('stroke-width', '1px');
+
+			// 새로 생성된 그룹에 Text를 넣는다.
+			tweetGroup.append("text")
+				.text(function(d) {
+					return d.user + '-' + d.tweetTime.getHours();
+				});
+
+			// 4개의 가장 앞데이터를 제외한 나머지 모든 엘리먼트를 제거한다. (exit)
+			// 이게 exit가 결국 데이터를 덮어버린다.
+			console.log(d3.selectAll('g').data([1,2,3,4]).exit())
+			// 보면 알겟지만 exit한순간 바인딩 된 값과 매칭 된데이터는 1,2,3,4로 순서값만 들어가게 된다.
+			d3.selectAll('g').each(function(d) { console.log(d); });	// 1, 2, 3, 4
+
+			// 4개 값 제외하고 모두 삭제
+			d3.selectAll('g').data([1,2,3,4]).exit().remove();
+
+			// d3는 하지만 실제 다시 데이터를 랜더링 하지 않고서야 데이터가 바뀐다고 재랜더링 하지 않는다. 그래서 아래처럼 다시 데이터를 변경 할 수 있다.
+			d3.selectAll('g').select('text').text(function(d) {return d;});
+
+			//바로 윗라인에서 text에 값을 덮어 썻으니 1,2,3,4가 표시
+			d3.selectAll('text').each(function(d) { console.log(d); });	// 1, 2, 3, 4
+
+			// circle은 아직 데이터를 덮지 않았으니 기존 tweetData 배열에서 가져온 데이터를 반환한다.
+			d3.selectAll('circle').each(function(d) { console.log(d); });	// object값들...
+	}	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>

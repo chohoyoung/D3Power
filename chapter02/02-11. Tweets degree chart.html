@@ -1,0 +1,65 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-11. Tweets degree chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	// tweets를 로딩해서 쓴다.
+	d3.json('../data/tweets.json', function(error, data) {
+		console.log(data)
+		degreeView(data.tweets);
+	});
+
+	function degreeView(data) {
+		for(el of data) {
+			// favorite 갯수와 retweet 갯수를 구해서 영향력 점수라 하자. 그리고 새로운 속성에 넣자.
+			el.impact = el.favorites.length + el.retweets.length;
+			// ISO 8906 표준에 따르는 문자를 Date로 바꾸자. 그리고 새로운 속성에 넣자.
+			el.tweetTime = new Date(el.timestamp);
+		}
+
+		console.log(data);
+
+		// 영향력 최대 점수를 구한다.
+		let maxImpact = d3.max(data, function(el) { return el.impact; });
+		// 최초/마지막 시간을 구한다.
+		let startEndDate = d3.extent(data, function(el) { return el.tweetTime; });
+		// 시간 정규화, startEndDate는 배열 [최초, 마지막]
+		let timeRamp = d3.scaleLinear().domain(startEndDate).range([20, 480]);
+		// 영향력 점수 정규화
+		let yScale = d3.scaleLinear().domain([0, maxImpact]).range([0, 460]);
+		// 원의 반지름 사이즈 크기
+		let radiusScale = d3.scaleLinear().domain([0, maxImpact]).range([0, 20]);
+		// 영향력을 흰색과 진한 빨간색 사이의 색으로 대응하는 스캐일 생성
+		let colorScale = d3.scaleLinear().domain([0, maxImpact]).range(['white', '#990000']);
+
+		d3.select('svg')
+			.selectAll('circle')
+			.data(data)
+			.enter()
+			.append('circle')
+			// 영향력 높을수록 원이 커진다.
+			.attr('r', function(d) { return radiusScale(d.impact); })
+			// 나중에 발생된 트윗은 우측으로
+			.attr('cx', function(d) { return timeRamp(d.tweetTime); })
+			// 영향력이 높을 수록 위로 
+			.attr('cy', function(d) { return 480 - yScale(d.impact); })
+			// 영향력이 높을수록 많이 붉은 색이다.
+			.style('fill', function(d) { return colorScale(d.impact); })
+			.style('stroke', 'black')
+			.style('stroke-width', '1px');
+	}	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>

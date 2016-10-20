@@ -1,0 +1,54 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-09. Cities Line chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	// cities의 population 속성을 근간으로 짝대기를 그려본다.
+	d3.csv('../data/cities.csv', function(error, data) {
+		lineView(data);
+	});
+
+	function lineView(data) {
+		// 최대 population을 구한다.
+		let maxPopulation = d3.max(data, function(el) {
+			return parseInt(el.population);
+		});
+
+		let yScale = d3.scaleLinear().domain([0, maxPopulation]).range([0, 460]);
+
+		d3.select('svg').attr('style','height: 480px; width: 600px;');
+		d3.select('svg')
+			.selectAll('rect')
+			.data(data)
+			.enter()
+			.append('rect')
+			.attr('width', 50)
+			.attr('height', function(d) {
+				return parseInt(yScale(d.population));
+			})
+			.attr('x', function(d, i) { return i * 60; })
+			.attr('y', function(d) { return 480 - yScale(parseInt(d.population)); })
+			.style('fill', 'blue')
+			.style('stroke', 'red')
+			.style('stroke-width', '1px')
+			.style('opacity', .25);
+
+
+		console.log(maxPopulation);
+	}	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>
+

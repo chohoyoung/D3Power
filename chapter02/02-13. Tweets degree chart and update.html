@@ -1,0 +1,74 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-13. Tweets degree chart and update
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	// tweets를 로딩해서 쓴다.
+	d3.json('../data/tweets.json', function(error, data) {
+		degreeView(data.tweets);
+	});
+
+	function degreeView(data) {
+		for(el of data) {
+			// favorite 갯수와 retweet 갯수를 구해서 영향력 점수라 하자. 그리고 새로운 속성에 넣자.
+			el.impact = el.favorites.length + el.retweets.length;
+			// ISO 8906 표준에 따르는 문자를 Date로 바꾸자. 그리고 새로운 속성에 넣자.
+			el.tweetTime = new Date(el.timestamp);
+		}
+
+		// 영향력 최대 점수를 구한다.
+		let maxImpact = d3.max(data, function(el) { return el.impact; });
+		// 최초/마지막 시간을 구한다.
+		let startEndDate = d3.extent(data, function(el) { return el.tweetTime; });
+		// 시간 정규화, startEndDate는 배열 [최초, 마지막]
+		let timeRamp = d3.scaleLinear().domain(startEndDate).range([20, 480]);
+		// 영향력 점수 정규화
+		let yScale = d3.scaleLinear().domain([0, maxImpact]).range([0, 460]);
+		// 원의 반지름 사이즈 크기
+		let radiusScale = d3.scaleLinear().domain([0, maxImpact]).range([2, 20]);
+		
+		let tweetGroup = d3.select('svg')
+			.selectAll('circle')
+			.data(data, function(d) {
+				// 특정 key나 고유한 속성어떤것들인지 사용할 수 있다. 그러나 고유한 값이 없으면 객체 전체를 사용해도 된다.
+				// 근데 객체 전체를 사용하려면 객체를 문자열화해야한다.
+				return JSON.stringify(d);
+			})
+			.enter()
+			.append('circle')
+			// 영향력 높을수록 원이 커진다.
+			.attr('r', function(d) { return radiusScale(d.impact); })
+			// 나중에 발생된 트윗은 우측으로
+			.attr('cx', function(d) { return timeRamp(d.tweetTime); })
+			// 영향력이 높을 수록 위로 
+			.attr('cy', function(d) { return 480 - yScale(d.impact); })
+			// 영향력이 높을수록 많이 붉은 색이다.
+			.style('stroke', 'black')
+			.style('stroke-width', '1px');
+
+		// 영향력 값이 0보다 큰것들만 필터링 한다.
+		let filteredData = data.filter((el) => {
+			return el.impact > 0;
+		});
+
+		//영향역 점수가 0인것들을 제거 하기 위에 필터 값을 넘기고 만약 영향력 값이 0보다 작은 것들은 exit()와 remove()로 제거 했다.
+		d3.selectAll('circle')
+			.data(filteredData, function(d) { return JSON.stringify(d); })
+			.exit()
+			.remove();
+	}	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>

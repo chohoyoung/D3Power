@@ -1,0 +1,64 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-10. Tweets Line chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	// tweets를 로딩해서 쓴다.
+	d3.json('../data/tweets.json', function(error, data) {
+		console.log(data)
+		lineView(data.tweets);
+	});
+
+	function lineView(data) {
+		// user로 key로 그룹화 한다.
+		let nestedTweets = d3.nest()
+			.key(function(el) { return el.user; })
+			.entries(data);
+
+		console.log(nestedTweets);
+
+		for(el of nestedTweets) {
+			console.log(el)
+			// 새로운 properties를 만들고 거기에 값의 크기를 저장한다.
+			el.numTweets = el.values.length;
+		}
+
+		//가장 많이 트윗된 갯수를 구한다.
+		let maxTweets = d3.max(nestedTweets, function(el) { return el.numTweets; });
+
+		let yScale = d3.scaleLinear().domain([0, maxTweets]).range([0, 100]);
+
+		d3.select('svg').attr('style','height: 480px; width: 600px;');
+		d3.select('svg')
+			.selectAll('rect')
+			.data(nestedTweets)
+			.enter()
+			.append('rect')
+			.attr('width', 50)
+			.attr('height', function(d) {
+				return parseInt(yScale(d.numTweets));
+			})
+			.attr('x', function(d, i) { return i * 60; })
+			.attr('y', function(d) { return 100 - yScale(parseInt(d.numTweets)); })
+			.style('fill', 'blue')
+			.style('stroke', 'red')
+			.style('stroke-width', '1px')
+			.style('opacity', .25);
+		
+	}	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>
+
