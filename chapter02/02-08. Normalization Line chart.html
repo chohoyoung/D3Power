@@ -1,0 +1,57 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-08. Normalization Line chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	//이렇게 큰값일 경우 기존 방식으로는 실제 가장 큰라인만 찍혀버릴것이다.
+	let arr = [10, 68, 25000, 4000, 100, 30, 500]; 
+
+	// 일반 선형 사용
+	let newScale = d3.scaleLinear().domain([0, 50000]).range([0, 100]);
+
+	// 다중선형(polylinear) 사용 : 값의 차이가 심할 경우 사용 한다.
+	let polylinearScale = d3.scaleLinear().domain([0, 100, 4000, 50000]).range([0, 25, 70, 100]);
+
+	// 500이상값은 무조건 100으로.. 하지만 500보다 큰값을 다 100이상값으로 반환한다.
+	let scale500 = d3.scaleLinear().domain([0, 100, 500]).range([0, 50, 100]);
+	console.log(scale500(10000));	// 1287.5
+
+	// 500이상값은 무조건 100으로.. 하지만 500보다 큰값을 다 100이상값으로 반환한다.
+	let newScale500 = d3.scaleLinear().domain([0, 100, 500]).range([0, 50, 100]).clamp(true);
+	console.log(newScale500(10000));	// 100
+
+
+	d3.select('svg')
+		.selectAll('rect')
+		.data(arr)
+		.enter()
+		.append('rect')
+		.attr('width', 10)
+		.attr('height', function(d) { return newScale500(d); })
+		.style('fill', 'blue')
+		.style('stroke', 'red')
+		.style('stroke-width', '1px')
+		.style('opacity','25')
+		.attr('x', function(d, i) {	// 값의 index를 *10만큼 우측이동 하게 함.
+			return i * 10;
+		})
+		.attr('y', function(d, i) {
+			return 100 - newScale500(d);
+		});
+	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>
+

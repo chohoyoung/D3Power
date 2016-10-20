@@ -1,0 +1,40 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	02-07. Line chart
+</title>
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+
+<script>
+
+window.onload = function() {
+	d3.select('svg')
+		.selectAll('rect')
+		.data([15, 50, 22, 8, 100, 10])
+		.enter()
+		.append('rect')
+		.attr('width', 10)
+		.attr('height', function(d) { return d; })
+		.style('fill', 'blue')
+		.style('stroke', 'red')
+		.style('stroke-width', '1px')
+		.style('opacity','25')
+		.attr('x', function(d, i) {	// 값의 index를 *10만큼 우측이동 하게 함.
+			return i * 10;
+		})
+		.attr('y', function(d, i) {
+			return 100 - d;
+		})
+		;
+	
+}
+
+</script>
+</head>
+<body>
+	<svg style="width:500px;height:500px;border:1px lightgray solid;" />
+</body>
+</html>
+

@@ -77,3 +77,27 @@ append로 요소를 추가 할 수 있다 그리고 insert는 append와 다르�
 전통적인 DOM요소의 컨텐츠는 html메서드로 설정한다.
 ### 2.3.2 인라인 함수로 데이터 접근
 02-07. Line chart.html
+### 2.3.3 스케일 통합
+02-07. Line chart.html예제처럼 높이에 대응하는 값의 배열을 사용해도 괜챃긴 하다, 하지마 실제 값들은 데이터의 편차거 심해서 값을 직접 대응시키가 힘들경우가 많다. 이렬경우는 값을 정규화 한다. scaleLinear()을 사용해서 정규화 해도 너무 큰 차이라면 이상하게 표시가 된다 이럴 경우 다중 선형 스케일을 쓰는게 좋다.
+
+    let newScale = d3.scaleLinear().domain([0, 50000]).range([0, 100]);
+
+    // 다중선형(polylinear) 사용 : 값의 차이가 심할 경우 사용 한다.
+    let polylinearScale = d3.scaleLinear().domain([0, 100, 4000, 50000]).range([0, 25, 70, 100]);
+
+만약 500이상 응답을 받은 경우 무조건 100이라고 찍고 싶다면 다음과 같이 할 수 있다.
+
+    let scale500 = d3.scaleLinear().domain([0, 100, 500]).range([0, 50, 100]);
+    console.log(scale500(10000));	// 1287.5
+
+기본적으로 d3의 스케일은 최소, 최대값보다 큰값이나 작은 값을 추정한다. 만약 추정하지 않으려면 clamp()를 사용해야 한다.
+
+    // 500이상값은 무조건 100으로.. 하지만 500보다 큰값을 다 100이상값으로 반환한다.
+    let newScale500 = d3.scaleLinear().domain([0, 100, 500]).range([0, 50, 100]).clamp(true);
+    console.log(newScale500(10000));	// 100 
+
+## 2.4 데이터 표현 스타일, 속성, 컨텐츠
+### 2.4.1 로딩된 데이터를 시각화
+02-09. Cities Line chart.html
+
+
