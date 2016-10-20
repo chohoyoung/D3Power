@@ -76,3 +76,4 @@ append로 요소를 추가 할 수 있다 그리고 insert는 append와 다르�
 #### html()
 전통적인 DOM요소의 컨텐츠는 html메서드로 설정한다.
 ### 2.3.2 인라인 함수로 데이터 접근
+02-07. Line chart.html
