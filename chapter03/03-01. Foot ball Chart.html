@@ -1,0 +1,123 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	03-01. Foot ball chart
+</title>
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	
+	// worldcup.cvs를 로딩한다.
+	d3.csv('../data/worldcup.csv', function(data) {
+		console.log(data);
+		createTeamView(data);
+	});
+
+	function createTeamView(data) {
+		// 중간 G그룹생성하고 그안에 Group들을 생성한다.
+		d3.select('svg')
+		.append('g')
+		.attr('id', 'teamsG')
+		.attr('transform', 'translate(50, 300)')
+		.selectAll('g')
+		.data(data)
+		.enter()
+		.append('g')
+		.attr('class', 'overallG')
+		.attr('transform', function(d, i){
+			return 'translate(' + (i * 50) + ', 0)';
+		});
+
+		let teamG = d3.selectAll('g.overallG');
+		
+		// delay를 보면 알겟지만 d3에서 처리는 병렬로 동작하는거 같다.
+		teamG.append('circle')
+		.attr('r', 0)
+		.transition()
+		.delay(function(d, i) { return i * 100 })	// 인덱스별 * 0.1초 간 딜레이
+		.duration(500)
+		.attr("r", 40)
+		.transition()
+		.duration(500)
+		.attr('r', 20)
+		.style('fill', 'pink')
+		.style('stroke', 'black')
+		.style('stroke-width', '1px');
+
+		teamG
+		.append('text')
+		.style('text-anchor', 'middle')
+		.attr('y', 30)
+		.style('font-size', '10px')
+		.text(function(d) { return d.team; });
+
+		// 마우스 over시에 over한건 빨간색(red) 나머진 (gray)로 만들자
+		teamG.on("mouseover", function(circleData) {
+			d3.selectAll('g.overallG').select('circle')
+			.style('fill', function(d) {
+				if(circleData === d) {
+					return 'red';
+				} else {
+					return 'gray';
+				}
+			});
+		})
+
+		// 마우스 over시 다시 모든 것을 핑크색으로
+		teamG.on('mouseout', function(circleData) {
+			d3.selectAll('g.overallG').select('circle')
+			.style('fill', 'pink');
+		});
+
+		/** 
+			버튼 생성
+		**/
+		// 데이터 key중에서 수치화 데이터 아닌 team하고 region을 걸러낸다.
+		let dataKeys = d3.keys(data[0]).filter((el) => {
+			return el != 'team' && el != 'region';
+		});
+
+		// 바인딩 된 데이터는 무조건 1번째 인자로써 들어간다.
+		let buttonClick = function(btnData) {
+			let maxValue = d3.max(data, function(d) {
+				return +d[btnData];
+			});
+
+			let radiusScale = d3.scaleLinear().domain([0, maxValue]).range([2, 20]);
+
+			//버튼을 마우스로 클릭했을때 모든 날짜의 값을 현재 선택한 key값으로 설정한다.
+			d3.selectAll('g.overallG').selectAll('circle')
+			.transition().duration(500)	// transition과 duration을 통해서 이쁘게 만들수 있다.
+			.attr('r', function(d) {
+				return radiusScale(d[btnData]);
+			});
+		};
+
+		d3.select('#controls').selectAll('button.teams')
+		.data(dataKeys)
+		.enter()
+		.append('button')
+		.on('click', buttonClick)	// 이 콜백메서드는 바인딩된 데이터에 접근이 가능하다.
+		.html(function(d) {
+			return d;
+		});
+		
+		
+	}
+
+
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:500px; height:500px; border:1px lightgray solid" />
+</div>
+<div id="controls" />
+</body>
+</html>
