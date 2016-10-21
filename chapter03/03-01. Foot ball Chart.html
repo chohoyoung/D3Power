@@ -11,6 +11,10 @@
 
 <script>
 window.onload = function() {
+
+	let abc = {'a' : 1};
+	console.log(abc === abc);
+	
 	
 	// worldcup.cvs를 로딩한다.
 	d3.csv('../data/worldcup.csv', function(data) {
@@ -29,7 +33,7 @@ window.onload = function() {
 		.enter()
 		.append('g')
 		.attr('class', 'overallG')
-		.attr('transform', function(d, i){
+		.attr('transform', function(d, i) {
 			return 'translate(' + (i * 50) + ', 0)';
 		});
 
@@ -49,29 +53,54 @@ window.onload = function() {
 		.style('stroke', 'black')
 		.style('stroke-width', '1px');
 
-		teamG
-		.append('text')
+		teamG.append('text')
 		.style('text-anchor', 'middle')
 		.attr('y', 30)
-		.style('font-size', '10px')
+		// .style('font-size', '10px')
 		.text(function(d) { return d.team; });
 
+		// insert를 사용해서 image를 text앞에 삽입한다.
+		d3.selectAll('g.overallG').insert('image', 'text')
+		.attr('xlink:href', function(d) {
+			return '../common/images/' + d.team + ".png";
+		})
+		.attr("width", '45px')
+		.attr('height', '20px')
+		.attr('x', '-22')
+		.attr('y', '-10');
+
+		// text에 포인터 이벤트를 사용 못하게 설정이 가능하다. 이러면 마우스 오버시 text영역으로 이벤트 잡는게 아닌 circle로만 잡기때문이다.
+		teamG.select('text').style('pointer-event','none');
+
 		// 마우스 over시에 over한건 빨간색(red) 나머진 (gray)로 만들자
-		teamG.on("mouseover", function(circleData) {
+		// 그리고 label에 class active를 주어서 label크기를 키워보자
+		teamG.on("mouseover", function(overData) {
+			let teamColor = d3.rgb('pink');
+
 			d3.selectAll('g.overallG').select('circle')
 			.style('fill', function(d) {
-				if(circleData === d) {
-					return 'red';
+
+				if(overData === d) {
+					return teamColor.darker(.75);	// rgb()의 darker는 현재 색보다 어두운색
 				} else {
-					return 'gray';
+					return teamColor.brighter(.5); 	// rgb()의 brighter는 현재 색보다 밝은 색
+				}
+			});
+
+			d3.selectAll('g.overallG').select('text').each(function(d, i) {
+				// 객체로 비교하는게 더 빠르나..? 아님 속성 키 조회해서 비교하는게 빠를까? ㅋㅋㅋㅋ
+				if(d === overData) {
+					d3.select(this).classed('active', true);
+				} else {
+					d3.select(this).classed('inactive', true);
 				}
 			});
 		})
 
 		// 마우스 over시 다시 모든 것을 핑크색으로
 		teamG.on('mouseout', function(circleData) {
-			d3.selectAll('g.overallG').select('circle')
-			.style('fill', 'pink');
+			d3.selectAll('g.overallG').select('circle').style('fill', 'pink');
+			d3.select(this).select('text').classed('active', false);
 		});
 
 		/** 
@@ -84,17 +113,38 @@ window.onload = function() {
 
 		// 바인딩 된 데이터는 무조건 1번째 인자로써 들어간다.
 		let buttonClick = function(btnData) {
+			// 클릭된 버튼의 속성의 가장 큰 값을 반환
 			let maxValue = d3.max(data, function(d) {
 				return +d[btnData];
 			});
 
 			let radiusScale = d3.scaleLinear().domain([0, maxValue]).range([2, 20]);
 
+			// yellow - blue의 값을 스케일해서 처리
+			let ybRamp = d3.scaleLinear().domain([0, maxValue]).range(['yellow', 'blue']);
+			
+			// 이런 값을 HCL색상 모델을 통해서 사용할 수 있다. HCL은 색상, 농도, 휘도에 기초한 데이터를 넘겨준다.
+			let ybRampHCL = d3.scaleLinear().interpolate(d3.interpolateHsl).domain([0, maxValue]).range(['yellow', 'blue']);
+			
+			// LAB은 L 과 A,B를 기초데이터로 중간 색을 반환한다. L은 밝기 이고 A, B는 색의 대응공간(color opponent space)를 뜻한다.
+			let ybRampLAB = d3.scaleLinear().interpolate(d3.interpolateLab).domain([0, maxValue]).range(['yellow', 'blue']);
+			
+			// scaleOrdinal은 칼라값의 배열을 받고 그리고 range를 이미 가진 scale을 넘겨준다.
+			// schemeCategory10는 d3에서 제공하는 잘구분되는 색상 10가지를 배열로 넘겨준다. 참고로 20도 있고 20c이런것도 있다.
+ 			let colorCategory10 = d3.scaleOrdinal(d3.schemeCategory10).domain(['UEFA','CONMEBOL','CAF','AFC']);
+
+ 			//quantize는 range값의 갯수로 분류를 잡아서 사용할 수 있게 한다.
+ 			let colorQuantize3 = d3.scaleQuantize().domain([0, maxValue]).range(colorbrewer.Reds[3]);
+ 			let colorQuantize5 = d3.scaleQuantize().domain([0, maxValue]).range(colorbrewer.Reds[5]);
+
+ 			
 			//버튼을 마우스로 클릭했을때 모든 날짜의 값을 현재 선택한 key값으로 설정한다.
 			d3.selectAll('g.overallG').selectAll('circle')
 			.transition().duration(500)	// transition과 duration을 통해서 이쁘게 만들수 있다.
-			.attr('r', function(d) {
-				return radiusScale(d[btnData]);
+			.attr('r', function(d) { return radiusScale(d[btnData]); })
+			.style('fill', function(d) { 
+				console.log(d[btnData]);
+				return colorQuantize3(d[btnData]);
 			});
 		};
 
@@ -106,10 +156,23 @@ window.onload = function() {
 		.html(function(d) {
 			return d;
 		});
+
+		// 인라인 함수에서 this란?
+		d3.select('circle').each(function(d, i) {
+			console.log(d);	// 바인딩 된 데이터
+			console.log(i);	// 인덱스
+			console.log(this);	//dom객체에 접근한다. 바인딩 된 데이터가 아니다
+
+		});
 		
-		
+		// 가장 첫번째 circle을 찾아 dom을 반환한다.
+		d3.select('circle').node();
 	}
 
+	let red1 = d3.rgb('red');
+	let red2 = d3.rgb('#ff0000');
+	let red3 = d3.rgb('rgb(255,0,0)');
+	let red4 = d3.rgb(255,0,0);
 
 }
 </script>
