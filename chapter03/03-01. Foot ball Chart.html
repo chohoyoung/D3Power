@@ -157,6 +157,19 @@ window.onload = function() {
 			return d;
 		});
 
+		// text로 html을 분석하고 데이터를 html로 넣는다.
+		d3.text('modal.html', function(d) {
+			// body에 div를 추가후 div에 modal을 주고 그안에 modal.html의 코드를 넣는다.
+			d3.select("body").append("div").attr("id", "modal").html(d);
+		});
+
+		let teamClick =d=> {
+			//d3.values는 인자로 받는 object값에서 value만 추려내 배열로 바꾸어준다.
+			d3.selectAll('td.data').data(d3.values(d)).html(p => { return p; });
+		}
+
+		teamG.on('click', teamClick)
+
 		// 인라인 함수에서 this란?
 		d3.select('circle').each(function(d, i) {
 			console.log(d);	// 바인딩 된 데이터

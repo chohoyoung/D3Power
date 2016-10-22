@@ -81,4 +81,14 @@ D3에서 제공하는 색상 팔래트도 있는데 그밖에 신시아 브루�
 	.attr('y', '-10');
 
 ### 3.4.2 HTML
+우리는 미리 만들어지고 디자인 되어진 HTML을 가져다 쓸 수도 있을 것이다. 방식은 간단한데 기존 csv나 json처럼 html을 로드해서 html에 담으면 되는데 아래와 같이 할 수 있다. html이나 xml이나 d3에서 제공해주는 d3.text()로 사용해서 데이터를 받아올수 있다.
+
+    // text로 html을 데이터를 가져오고ㄴ 데이터를 html로 넣는다.
+	d3.text('modal.html', function(d) {
+		// body에 div를 추가후 div에 modal을 주고 그안에 modal.html의 코드를 넣는다.
+		d3.select("body").append("div").attr("id", "modal").html(d);
+	});
+### 3.4.3 외부 SVG파일 사용 (차후 정리)
+
+
 
