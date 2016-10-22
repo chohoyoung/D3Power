@@ -1,0 +1,66 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Money Friend
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	const scatterData = [
+		{friends:5 , salary: 22000},
+		{friends:3 , salary: 18000},
+		{friends:10 , salary: 88000},
+		{friends:0 , salary: 180000},
+		{friends:27 , salary: 56000},
+		{friends:8 , salary: 74000}
+	];
+	
+	// salary의 최소 최대값의 배열을 리턴하는 extent!
+	const xExtent = d3.extent(scatterData, d => { return d.salary; });
+	// 친구수의 최소 최대값의 배열을 리턴하는 extent!
+	const yExtent = d3.extent(scatterData, d => { return d.friends; });
+
+	const xScale = d3.scaleLinear().domain(xExtent).range([0, 500]);	// 월급값 정규화
+	const yScale = d3.scaleLinear().domain(yExtent).range([0, 500]);	// 친구수값 정규화
+
+	d3.select('svg').selectAll('circle')
+	.data(scatterData)
+	.enter()
+	.append('circle')
+	.attr('r', 5)
+	.attr('cx', (d, i) => { return xScale(d.salary); })	//인덱스 순서대로 우측으로
+	.attr('cy', (d) => { return yScale(d.friends); })	// 친구가 많을수록 아래로 간다.
+
+	// axis는 axisTop, axisLeft, axisBottom, axisRight가 있으며 left, top이런 것은 label의 방향을 뜻한다.
+	// Axis는 tickSize나 ticks메소드를 제공하는데 각각 axis의 값을 매핑하고 axis를 리턴한다.
+	let xBottomAxis = d3.axisBottom(xScale).tickSize(500).ticks(4);
+	let yRightAxis = d3.axisRight(yScale).tickSize(500).ticks(16);
+	let xTopAxis = d3.axisTop(xScale);
+	let yLeftAxis = d3.axisLeft(yScale);
+
+	d3.select('svg').append('g').attr('id', 'xBottomAxis').call(xBottomAxis);
+	d3.select('svg').append('g').attr('id', 'yRightAxis').call(yRightAxis);
+
+	//만약 우측 아래에 축을 놓으려면 아래처럼 할 수 있다.
+	// d3.select('svg').append('g').attr('id', 'xTopAxis').attr('transform','translate(0,500)').call(xTopAxis);
+	// d3.select('svg').append('g').attr('id', 'yLeftAxis').attr('transform','translate(500,0)').call(yLeftAxis);
+	
+	// 2개의 축의 path.domain은 기본적으로 색이 없다. 한번 빨간색으로 칠해보자
+	//d3.selectAll('path.domain').style('fill','red');
+	
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>

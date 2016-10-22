@@ -1,0 +1,91 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Pink Snow
+</title>
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	const redSnow = [
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10},
+		{speed:10 , r: 10}
+	];
+
+	
+	d3.timer(_=>{
+		d3.select('svg').selectAll('circle')
+		.data(redSnow)
+		.enter()
+		.append('circle')
+		.attr('r', 5)
+		.attr('cx', (d, i) => { return (Math.floor(Math.random() * 50) + 1 )*10 })	//인덱스 순서대로 우측으로
+		.attr('cy', (d) => { return -10; })	// 친구가 많을수록 아래로 간다.
+		.transition()
+		.duration((d, i) => {
+			return (d.speed + Math.floor(Math.random() * 25) + 1) * 1000
+		})
+		.attr('cy', 510)
+		.remove();
+		}, 500)
+	
+
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:500px; height:500px; border:1px lightgray solid" />
+</div>
+</body>
+</html>
