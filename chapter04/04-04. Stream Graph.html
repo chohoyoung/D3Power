@@ -1,0 +1,73 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Money Friend
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	/**
+		day,movie1,movie2,movie3,movie4,movie5,movie6
+		1,20,8,3,0,0,0
+		...
+	**/
+	d3.csv('../data/movies.csv', streamChart);
+
+	function streamChart(data) {
+		let xScale = d3.scaleLinear().domain([1, 10]).range([20, 470]);
+		let yScale = d3.scaleLinear().domain([0, 100]).range([480, 20]);
+
+		// x,yAxis를 그린다.
+		let xAxis = d3.axisBottom(xScale).tickSize(480).tickValues([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+		let yAxis = d3.axisRight(yScale).ticks(10).tickSize(480);
+
+		d3.select('svg').append('g').attr('id', 'xAsixG').call(xAxis);
+		d3.select('svg').append('g').attr('id', 'yAxisG').call(yAxis);
+
+		let fillScale = d3.scaleLinear().domain([0, 5]).range(['lightgray', 'black']);
+		let n = 0;
+		
+		for(x in data[0]) {
+			if(x != 'day') {
+				let movieArea = d3.area()
+				.x((d) => { return xScale(d.day); })
+				.y1((d) => { return yScale(d[x]); })
+				.y0((d) => { 
+					console.log(yScale(-d[x]))
+					return yScale(-d[x]); 
+				})	// area의 y0은 
+				.curve(d3.curveCardinal); 
+
+				d3.select('svg')
+				.append('path')
+				.style('id', x + 'Area')
+				.attr('d', movieArea(data))
+				
+				.attr('stroke', 'lightgray')
+
+				.attr('fill', fillScale(n))
+				.attr('stroke-width', 2)
+				.style('opacity', .75);
+				console.log(n)
+			}
+			n = n + 1;
+		}
+	}
+
+
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>

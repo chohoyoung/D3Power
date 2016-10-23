@@ -1,0 +1,117 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Money Friend
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	/**
+		day, tweets, retweets, favorites
+		1, 1, 2, 5
+		...
+	**/
+	d3.csv('../data/tweetdata.csv', lineChart);
+
+	function lineChart(data) {
+		let xScale = d3.scaleLinear().domain([1, 10.5]).range([20, 480]);
+		let yScale = d3.scaleLinear().domain([0, 35]).range([480, 20]);
+
+		// x,yAxis를 그린다.
+		let xAxis = d3.axisBottom(xScale).tickSize(480).tickValues([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+		let yAxis = d3.axisRight(yScale).ticks(10).tickSize(480);
+
+		d3.select('svg').append('g').attr('id', 'xAsixG').call(xAxis);
+		d3.select('svg').append('g').attr('id', 'yAxisG').call(yAxis);
+
+		// 날짜별 tweets를 점으로 찍는다.
+		d3.select('svg').selectAll('circle.tweets')
+		.data(data).enter()
+		.append('circle')
+		.attr('class', 'tweets')
+		.attr('r', 5)
+		.attr('cx', (d) => { return xScale(d.day); })	//날짜별로 우측으로 간다
+		.attr('cy', (d) => { return yScale(d.tweets); })	//날짜별로 아래로 간다.
+		.style('fill', 'black');
+
+		// 날짜별 retweets를 점으로 찍는다.
+		d3.select('svg').selectAll('circle.retweets')
+		.data(data).enter()
+		.append('circle')
+		.attr('class', 'tweets')
+		.attr('r', 5)
+		.attr('cx', (d) => { return xScale(d.day); })	//날짜별로 우측으로 간다
+		.attr('cy', (d) => { return yScale(d.retweets); })	//날짜별로 아래로 간다.
+		.style('fill', 'lightgray');
+
+		// 날짜별 favorites를 점으로 찍는다.
+		d3.select('svg').selectAll('circle.favorites')
+		.data(data).enter()
+		.append('circle')
+		.attr('class', 'tweets')
+		.attr('r', 5)
+		.attr('cx', (d) => { return xScale(d.day); })	//날짜별로 우측으로 간다
+		.attr('cy', (d) => { return yScale(d.favorites); })	//날짜별로 아래로 간다.
+		.style('fill', 'gray');
+
+		// d3.line은 데이터에 따라 path에서 사용할 path를 생성해서 넘긴다.
+		// 선을 생성하는 line생성기를 1개만 만들어놓고 각각의 선을 그릴때 y()접근자나 y()접근자 메서드만 변경하면 더 효율적으로 할 수 있다.근데 코드를 알아보기 쉽게 하려면 각각의 생성기를 그리는것도 고려해볼만하다.
+		let tweetLine = d3.line()	// tweet라인 그리는 생성기
+		.x((d) => { return xScale(d.day); })
+		.y((d) => { return yScale(d.tweets); });
+
+		let retweetLine = d3.line()	// tweet라인 그리는 생성기
+		.x((d) => { return xScale(d.day); })
+		.y((d) => { return yScale(d.retweets); });
+
+		let favoritesLine = d3.line()	// favorites라인 그리는 생성기
+		.x((d) => { return xScale(d.day); })
+		.y((d) => { return yScale(d.favorites); });
+
+		// 각라인별 interpolate(보간법)을 변경함.
+		tweetLine.curve(d3.curveCardinal);
+		retweetLine.curve(d3.curveBasis);
+		favoritesLine.curve(d3.curveStep);
+
+		// tweetLine생성기를 사용해서 그림을 그린다.
+		d3.select('svg')
+		.append('path')
+		.attr('d', tweetLine(data))
+		.attr('fill', 'none')
+		.attr('stroke', 'darkred')
+		.attr('stroke-width', 2);
+
+		// retweetLine생성기를 사용해서 그림을 그린다.
+		d3.select('svg')
+		.append('path')
+		.attr('d', retweetLine(data))
+		.attr('fill', 'none')
+		.attr('stroke', 'gray')
+		.attr('stroke-width', 3);
+
+		// favoritesLine생성기를 사용해서 그림을 그린다.
+		d3.select('svg')
+		.append('path')
+		.attr('d', favoritesLine(data))
+		.attr('fill', 'none')
+		.attr('stroke', 'black')
+		.attr('stroke-width', 2);
+	}
+
+
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>

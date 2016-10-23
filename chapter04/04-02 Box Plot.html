@@ -1,0 +1,114 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Money Friend
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	d3.csv('../data/boxplot.csv', scatterplot);
+
+	function scatterplot(data) {
+		console.log(data);
+
+		let xScale = d3.scaleLinear().domain([1, 8]).range([20, 470]);
+		// 거꾸로 스케일을 뒤집었다.
+		let yScale = d3.scaleLinear().domain([0, 100]).range([480, 20]);
+
+		let xAxis = d3.axisBottom(xScale).tickValues([1, 2, 3, 4, 5, 6, 7]).tickSize(-480); // tickValues는 눈금에 값을 매길수 있다.
+		d3.select('svg').append('g').attr('id', 'xAxis').attr('transform', 'translate(0, 480)').call(xAxis);
+
+		let yAxis = d3.axisRight(yScale).ticks(8).tickSize(-470);
+		d3.select('svg').append('g').attr('id', 'yAxis').attr('transform', 'translate(470, 0)').call(yAxis);
+
+		// d3.select('#xAxis > path.domain').style('display','none');
+		
+		// d3.select('svg').selectAll('circle.median')
+		// .data(data).enter()
+		// .append('circle')
+		// .attr('class', 'tweets')
+		// .attr('r', 5)
+		// .attr('cx', (d) => { return xScale(d.day); })	//날짜가 클수록 우측으로
+		// .attr('cy', (d) => { return yScale(d.median); })	// median(중앙값)이 클수록 아래로
+		// .style('fill', 'darkgray');	//우우 아름다운 회색
+
+		d3.select('svg').selectAll('g.box')
+		.data(data).enter()
+		.append('g')	// 왠만하면 g를 사용해서 표시를 하자. g요소안의 내부 값들은 g태그의 값으로 x,y축을 잡는다.
+		.attr('class', 'box')
+		.attr('transform', (d) => {
+			return 'translate(' + xScale(d.day) + ', ' + yScale(d.median) + ')';
+		}).each(function(d, i) {
+			
+			// 사각형을 관통 하는 쭉뻗은 선 가장 최초에 그려야 한다.
+			d3.select(this)
+			.append('line')
+			.attr('class', 'range')
+			.attr('x1', 0)
+			.attr('x2', 0)
+			.attr('y1', yScale(d.max) - yScale(d.median))
+			.attr('y2', yScale(d.min) - yScale(d.median))
+			.style('stroke', 'black')
+			.style('stroke-width', '4px');
+
+			// 최소-최대선의 꼭대기에 놓인 선
+			d3.select(this)
+			.append('line')
+			.attr('class', 'max')
+			.attr('x1', -10)
+			.attr('x2', 10)
+			.attr('y1', yScale(d.max) - yScale(d.median))
+			.attr('y2', yScale(d.max) - yScale(d.median))
+			.style('stroke', 'black')
+			.style('stroke-width', '4px');
+
+			// 최소-최대선의 아래에 놓인 선
+			d3.select(this)
+			.append('line')
+			.attr('class', 'min')
+			.attr('x1', -10)
+			.attr('x2', 10)
+			.attr('y1', yScale(d.min) - yScale(d.median))
+			.attr('y2', yScale(d.min) - yScale(d.median))
+			.style('stroke', 'black')
+			.style('stroke-width', '4px');
+
+
+			d3.select(this) // g객체를 가르킨다.
+			.append('rect')
+			.attr('x', '-10')
+			.attr('y', yScale(d.q3) - yScale(d.median))
+			.attr('width', 20)
+			.attr('height', yScale(d.q1) - yScale(d.q3))
+			.style('fill', 'white')
+			.style('stroke', 'black')
+			.style('stroke-width', '2px');
+
+			d3.select(this)
+			.append('line')
+			.attr('x1', -10)
+			.attr('x2', 10)
+			.attr('y1', 0)
+			.attr('y2', 0)
+			.style('stroke', 'darkgray')
+			.style('stroke-width', '4px');
+		});
+	}
+
+
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>
