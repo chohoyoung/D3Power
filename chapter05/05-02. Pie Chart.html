@@ -1,0 +1,51 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	05-02. Pie Chart
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	
+	// 파이차트 레이아웃을 생성하고
+	let pieChart = d3.pie();
+	pieChart.sort(null);
+	
+	// 파이 차트에 데이터를 넘겨줘서 파이를 위한 데이터포맷형태의 데이터를 만든다.
+	let yourPie = pieChart([1, 1, 2]);
+	console.log(yourPie);
+
+	let newArc = d3.arc();
+	newArc.innerRadius(0);		// 안에 값이 없다고 체크를 해줘야 한다 안그러면 오류 발생.
+	newArc.outerRadius(100);	// 반지름 100의 파이를 생성 하겟다.
+	console.log(newArc(yourPie[0]));	// Arc를 그리는데 필요한 path요소를 생성해서 반환한다.
+
+	d3.select('svg')
+	.append('g')
+	.attr('transform', 'translate(250, 250)')
+	.selectAll('path')
+	.data(yourPie)
+	.enter()
+	.append('path')
+	.attr('d', newArc)
+	.style('fill', 'blue')
+	.style('opacity', .5)
+	.style('stroke', 'black')
+	.style('stroke-width', '2px')
+	
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>

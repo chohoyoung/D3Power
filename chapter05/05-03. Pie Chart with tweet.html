@@ -1,0 +1,112 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	05-03. Pie Chart with tweet.html
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+
+	d3.json('../data/tweets.json', pieChart);
+
+	function pieChart(data) {
+		let tweetData = data.tweets;
+		let nestedTweets = d3.nest()
+			.key(function(el) { return el.user })	// 범주로 쓸 키를 지정
+			.entries(tweetData);	// 대상이되는 아이템
+
+		nestedTweets.forEach(function(el) {
+			el.numTweets = el.values.length;
+			// 전체 트윗에서 favorites 배열의 길이의 합을 구해서 트윗 담기 횟수의 전체 합계를 구한다.
+			el.numFavorites = d3.sum(el.values, (d) => {
+				return d.favorites.length;
+			});
+			// retweet의 배열의 합을 구해서 리트윗 담기 횟수의 전체 합계를 구한다.
+			el.numRetweets = d3.sum(el.values, (d) => {
+				return d.retweets.length;
+			});
+		});
+
+		// 파이차트 레이아웃을 생성하고
+		let pieChart = d3.pie();
+		pieChart.sort(null);
+		pieChart.value((d) => {	//어떤 데이를 쓸껀지 결정한다.
+			return d.numTweets;
+		});
+
+		let newArc = d3.arc();
+		newArc.innerRadius(20);		// 안에 값이 없다고 체크를 해줘야 한다 안그러면 오류 발생.
+		newArc.outerRadius(50);	// 반지름 100의 파이를 생성 하겟다.
+
+		// 파이 차트에 데이터를 넘겨줘서 파이를 위한 데이터포맷형태의 데이터를 만든다.
+		let yourPie = pieChart(nestedTweets);
+
+		d3.select('svg')
+		.append('g')
+		.attr('transform', 'translate(250, 250)')
+		.selectAll('path')
+		.data(yourPie)
+		.enter()
+		.append('path')
+		.attr('d', newArc)
+		.style('fill', 'blue')
+		.style('opacity', .5)
+		.style('stroke', 'black')
+		.style('stroke-width', '2px')
+
+		pieChart.value((d) => {
+			return d.numFavorites;
+		});
+
+		d3.selectAll('path').data(pieChart(nestedTweets))
+		.transition().duration(1000).attr('d', newArc);
+
+		// pieChart.value((d) => {
+		// 	return d.numRetweets;
+		// });
+
+		// d3.selectAll('path').data(pieChart(nestedTweets.fil))
+		// .transition().duration(1000).attr('d', newArc);
+
+		d3.selectAll('path').data(pieChart(nestedTweets.filter((d) => {
+			return d.numRetweets > 0;
+		})),
+		(d) => {
+			return d.data.key
+		})
+		.exit()
+		.remove();
+
+		// d3.selectAll('path').data(pieChart(nestedTweets.filter((d) => {
+		// 	return d.numRetweets > 0;
+		// })),
+		// (d) => {
+		// 	return d.data.key
+		// })
+		// .transition().duration(1000).attrTween('d', arcTween);
+
+		// function arcTween(a) {
+		// 	let i = d3.interpolate(this._current, a);
+		// 	this._current = i(0);
+		// 	return function(t) {
+		// 		return newArc(i(t));
+		// 	}
+		// }
+	}
+	
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>
