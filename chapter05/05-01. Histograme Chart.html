@@ -1,0 +1,53 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	04-01 Money Friend
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+	/**
+		{"user": "Al", "content": "I really love seafood.", "timestamp": " Mon Dec 23 2013 21:30 GMT-0800 (PST)", "retweets": ["Raj","Pris","Roy"], "favorites": ["Sam"]},
+	**/
+	d3.json('../data/tweets.json', function(err, data) {
+		histogram(data.tweets);
+	});
+
+	function histogram(data) {
+
+		let xScale = d3.scaleLinear().domain([0, 5]).range([0, 500]);
+		let yScale = d3.scaleLinear().domain([0, 10]).range([400, 0]);
+
+		let xAxis = d3.axisBottom(xScale).ticks(5);
+		d3.select('svg').append('g')
+		.attr('class', 'xAxis')
+		.attr('transform', 'translate(0,400)').call(xAxis);
+
+		// ihstograme 함수 생성
+		var histogram = d3.histogram().value((d) => {
+			console.log(d)
+			return d;
+		});
+
+
+	    
+
+
+	}
+	
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>
