@@ -1,0 +1,89 @@
+<html>
+<meta charset="utf-8" />
+<head>
+<title>
+	05-05. Tree Layout
+</title>
+
+<link type="text/css" rel="stylesheet" href="../common/css/d3ia.css" />
+<link type="text/css" rel="stylesheet" href="../common/css/ch4stylesheet.css" />
+
+<script src="../common/js/d3.js" type="text/Javascript"></script>
+<script src="../common/js/colorbrewer.js" type="text/Javascript"></script>
+
+<script>
+window.onload = function() {
+
+	d3.json('../data/pack.json', treeLayoutChart);
+
+	function treeLayoutChart(data) {
+
+		// 색 Scale
+		let depthScale = d3.scaleOrdinal(d3.schemeCategory10).domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+		let treeChart = d3.tree();
+		treeChart.size([500, 500]);
+
+		let packData = d3.hierarchy(data)
+		.sum(function(d) { return d.size; })
+      	.sort(function(a, b) { return b.value - a.value; });
+
+      	let line = d3.line()
+      	.x((d) => { return d.x })
+      	.y((d) => { return d.y })
+      	.curve(d3.curveLinear);
+
+      	let packViewData = treeChart(packData).descendants();
+      	
+		// d3의 node값을 g로 좌표에 등록한다.
+		d3.select('svg')
+		.append('g')
+		.attr('id', 'treeG')
+		.selectAll('g')
+		.data(packViewData)
+		.enter()
+		.append('g')
+		.attr('class', 'node')
+		.attr('transform', (d) => { return 'translate(' + d.x + ', ' + d.y + ')'});
+
+		// 모든node를 클래스로 가진 g노드안에 circle을 생성한다.
+		d3.selectAll('g.node')
+		.append('circle')
+		.attr('r', 10)
+		.style('fill', (d) => { return depthScale(d.depth); })
+		.style('stroke', 'white')
+		.style('stroke-width', '2px');
+
+		d3.select('#treeG').selectAll('path')
+		.data(packViewData.slice(1))
+		.enter()
+		.insert('path', 'g')
+	    .attr("class", "link")
+	    .attr("d", (d) => {
+	    	console.log(d);
+	    	// 수직
+	        return "M" + d.x + "," + d.y
+		         + "C" + d.x + "," + (d.y + d.parent.y) / 2
+		         + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
+		         + " " + d.parent.x + "," + d.parent.y;
+		    // 수평
+		    // return "M" + d.y + "," + d.x
+	     //        + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+	     //        + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+	     //        + " " + d.parent.y + "," + d.parent.x;
+      });
+	    })
+		.style('fill', 'none')
+		.style('stroke', 'black')
+		.style('stroke-width', '2px')
+	}
+	
+}
+</script>
+</head>
+<body>
+<div>
+	<svg style="width:600px; height:600px; border:1px lightgray solid" />
+</div>
+</body>
+</html>

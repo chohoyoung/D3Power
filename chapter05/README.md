@@ -59,3 +59,28 @@ D3는 D3.histograme이라는 메서드가 있다. 이 메소드는 값을 자동
 		.style('stroke-width', '2px');
 
 ### 5.5 트리
+트리 레이아웃은 아래 처럼 사용 할 수 있다. tree도 children을 갖는 json데이터를 받으며 단지 트리의 node가 될 항목만 넘겨줄뿐이다. 실제 circle과 line등을 직접 다 그려줘야 한다.
+
+    let treeChart = d3.tree();
+	treeChart.size([500, 500]);
+	let packViewData = treeChart(packData).descendants();
+
+그리고 zoom컴포넌트를 통해서 확대를 할 수 있다. zoom 컴포넌트를 생성하고 컴포넌트에 익명함수나 함수를 인자로 넘긴다. 그러면 그 함수는 scroll, 이동 등등 이벤트호출시 다 호출이 된다. 자세한건 **[여기](https://github.com/d3/d3-zoom)**에서 확인 할 수 있다. 호출될때 d3.event.transform;를 받아서 실제 화면의 그룹의 transform에 적용하면 된다.
+
+    // zoom 컴포넌트 생성
+	let treeZoom = d3.zoom();
+
+	// zoom 컴포넌트에 줌이벤트를 등록한다.
+ 	treeZoom.on('zoom', zoomFunc);
+
+ 	// svg에 zoom 컴포넌트를 호출한다.
+ 	d3.select('svg').call(treeZoom);
+
+ 	function zoomFunc() {
+ 		// zoom 컴포넌트의 translate정보를 가져온다.
+ 		let zoomTranslate = d3.event.transform;
+ 		console.log(zoomTranslate)
+
+ 		d3.select('g.treeG').attr('transform', 'translate('+zoomTranslate.x+','+zoomTranslate.y + ') scale('+ zoomTranslate.k +')');
+ 	}
+
